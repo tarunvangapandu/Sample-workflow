@@ -1,0 +1,38 @@
+name: Build and deploy to ECS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: us-east-1
+      IMAGE_REPO_NAME: github-sample
+      IMAGE_TAG: sample_image
+      ECS_CLUSTER: sample-cluster
+      ECS_SERVICE: ecr-ecs
+    steps:
+      - uses: actions/checkout@v2
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          registry: ${{ secrets.AWS_REGISTRY_URL }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: ${{ env.IMAGE_REPO_NAME }}:${{ env.IMAGE_TAG }}
+      - name: Deploy to Amazon ECS
+        uses: aws-actions/aws-ecs-deploy@v2
+        with:
+          cluster: ${{ env.ECS_CLUSTER }}
+          service: ${{ env.ECS_SERVICE }}
+          image: ${{ env.IMAGE_REPO
