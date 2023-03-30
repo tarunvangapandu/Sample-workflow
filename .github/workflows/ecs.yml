@@ -41,6 +41,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
+          TAG: $(date +%Y-%m-%d.%H.%M.%S).$(echo ${{ github.sha }} | head -c 8)
         run: |
           # Build a docker container and
           # push it to ECR so that it can
