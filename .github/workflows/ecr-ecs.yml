@@ -40,11 +40,7 @@ jobs:
         id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        
-      - name: Generate Image Tag
-        id: tag
-         TAG="$(date +%Y-%m-%d.%H.%M.%S).$(echo $GITHUB_SHA | head -c 8)"
-         echo "::set-output name=tag::$TAG"
+          IMAGE_TAG: ${{ github.sha }}
         run: |
           # Build a docker container and
           # push it to ECR so that it can
